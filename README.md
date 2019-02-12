@@ -1,16 +1,16 @@
 ﻿## Iran stock websites:
-- (http://tse.ir/)[بورس اوراق بهادار تهران]
-- (http://www.sena.ir/)[پایگاه خبری بازار سرمایه ایران]
-- (https://www.codal.ir/)[سامانه جامع اطلاع رسانی ناشران]
-- (https://www.seo.ir/)[سازمان بورس و اوراق]
-- (http://www.tsetmc.com)[قیمت های بورس]
+- [http://tse.ir/](بورس اوراق بهادار تهران)
+- [http://www.sena.ir/](پایگاه خبری بازار سرمایه ایران)
+- [https://www.codal.ir/](سامانه جامع اطلاع رسانی ناشران)
+- [https://www.seo.ir/](سازمان بورس و اوراق)
+- [http://www.tsetmc.com](قیمت های بورس)
 
 ## Example
 For test select bank melat symbol:
 
-(http://www.tsetmc.com/Loader.aspx?ParTree=15)[Main Page]
+[http://www.tsetmc.com/Loader.aspx?ParTree=15](Main Page)
 
-(http://www.tsetmc.com/Loader.aspx?ParTree=151311&i=778253364357513#)[بانك ملت (وبملت)]
+[http://www.tsetmc.com/Loader.aspx?ParTree=151311&i=778253364357513#](بانك ملت (وبملت))
 
 	URI
 	http://cdn.tsetmc.com/Loader.aspx?ParTree=15131P&i=SYMBOL_ID&d=YEAR,MONTH,DAY
