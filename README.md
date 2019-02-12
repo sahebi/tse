@@ -12,9 +12,16 @@ For test select bank melat symbol:
 
 [http://www.tsetmc.com/Loader.aspx?ParTree=151311&i=778253364357513#](بانك ملت (وبملت))
 
+### Today Data
+	URI
+	http://www.tsetmc.com/Loader.aspx?ParTree=151311&i=SYMBOL_ID
+
+	Sample
+	http://www.tsetmc.com/Loader.aspx?ParTree=151311&i=778253364357513
+
+### Get Prior Data
 	URI
 	http://cdn.tsetmc.com/Loader.aspx?ParTree=15131P&i=SYMBOL_ID&d=YEAR,MONTH,DAY
-
 	Sample:
 	http://cdn.tsetmc.com/Loader.aspx?ParTree=15131P&i=778253364357513&d=20180212
 
