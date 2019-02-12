@@ -1,9 +1,9 @@
 ﻿## Iran stock websites:
-- [http://tse.ir/](بورس اوراق بهادار تهران)
-- [http://www.sena.ir/](پایگاه خبری بازار سرمایه ایران)
-- [https://www.codal.ir/](سامانه جامع اطلاع رسانی ناشران)
-- [https://www.seo.ir/](سازمان بورس و اوراق)
-- [http://www.tsetmc.com](قیمت های بورس)
+- [بورس اوراق بهادار تهران](http://tse.ir/)
+- [پایگاه خبری بازار سرمایه ایران](http://www.sena.ir/)
+- [سامانه جامع اطلاع رسانی ناشران](https://www.codal.ir/)
+- [سازمان بورس و اوراق](https://www.seo.ir/)
+- [قیمت های بورس](http://www.tsetmc.com)
 
 ## Example
 For test select bank melat symbol:
