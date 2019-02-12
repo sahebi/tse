@@ -1,4 +1,6 @@
-﻿## Iran stock websites:
+﻿# In this project, I want to download history data and make a dataset for the Tehran Stock Exchange (TSE). TSE dont share all data into internet free
+
+## Iran stock websites:
 - [بورس اوراق بهادار تهران](http://tse.ir/)
 - [پایگاه خبری بازار سرمایه ایران](http://www.sena.ir/)
 - [سامانه جامع اطلاع رسانی ناشران](https://www.codal.ir/)
@@ -8,9 +10,10 @@
 ## Example
 For test select bank melat symbol:
 
-[http://www.tsetmc.com/Loader.aspx?ParTree=15](Main Page)
+[Main Page](http://www.tsetmc.com/Loader.aspx?ParTree=15)
+[بانك ملت (وبملت)](http://www.tsetmc.com/Loader.aspx?ParTree=151311&i=778253364357513#)
 
-[http://www.tsetmc.com/Loader.aspx?ParTree=151311&i=778253364357513#](بانك ملت (وبملت))
+	Bank Melat SYMBOL_ID = 778253364357513
 
 ### Today Data
 	URI
@@ -26,6 +29,7 @@ For test select bank melat symbol:
 	http://cdn.tsetmc.com/Loader.aspx?ParTree=15131P&i=778253364357513&d=20180212
 
 
+### Analysis HTML and Javascript Files
 	StaticTreshholdData
 		[
 			[1,2497.00, 2261.00],
