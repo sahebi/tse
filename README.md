@@ -1,4 +1,4 @@
-﻿# In this project, I want to download history data and make a dataset for the Tehran Stock Exchange (TSE). TSE dont share all data into internet free
+﻿## In this project, I want to download history data and make a dataset for the Tehran Stock Exchange (TSE). TSE dont share all data into internet free
 
 ## Iran stock websites:
 - [بورس اوراق بهادار تهران](http://tse.ir/)
@@ -22,11 +22,46 @@ For test select bank melat symbol:
 	Sample
 	http://www.tsetmc.com/Loader.aspx?ParTree=151311&i=778253364357513
 
-### Get Prior Data
+### Get History Data
 	URI
 	http://cdn.tsetmc.com/Loader.aspx?ParTree=15131P&i=SYMBOL_ID&d=YEAR,MONTH,DAY
 	Sample:
 	http://cdn.tsetmc.com/Loader.aspx?ParTree=15131P&i=778253364357513&d=20180212
+
+The TSETMC website developers use a javascript function with name ens for adding javascript files into HTML document.
+
+Three javascript files used for handled HTML functionality:
+- http://cdn.tsetmc.com/tsev2/res/loader.aspx?t=j&_443
+- http://cdn.tsetmc.com/tsev2/res/loader.aspx?t=s&_443
+- http://cdn.tsetmc.com/tsev2/res/loader.aspx?t=h&_443
+
+In HTML file defined variables witcch used in javascript functions
+
+	var InstSimpleData = [
+						0 'بانك ملت',
+						1 'وبملت',
+						2 'بازار بورس',
+						3 'بازار اول (تابلوي اصلي) بورس',
+						4 1,
+						5 'N1',
+						6 'IRO1BMLT0007',
+						7 'IRO1BMLT0001',
+						8 50000000000,
+						9 9569378
+						];
+	var LVal30         = InstSimpleData[0]; **SYMBOL_NAME**
+	var LVal18AFC      = InstSimpleData[1]; **SYMBOL**
+	var FlowName       = InstSimpleData[3]; **TABLUE***
+	var Flow           = InstSimpleData[4]; **???***
+	var CgrValCot      = InstSimpleData[5]; **???***
+	var InstrumentID   = InstSimpleData[7]; **???***
+	var ZTitad         = InstSimpleData[8]; **???***
+	var BaseVol        = InstSimpleData[9]; **???***
+	var InsCode        = '778253364357513'; **SYMBOL_ID**
+	var CIsin          = '';
+	var PdrCotVal      = '';
+	var PClosing       = ''; 
+	var DEven          = '20180212';
 
 
 ### Analysis HTML and Javascript Files
