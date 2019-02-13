@@ -105,10 +105,10 @@ function InstHistoryInfo() {
         SetHevenLeftBox:
 
             function(d) {
-            var b = Math.floor(iVal / 3600);
-            var c = Math.floor((iVal - b * 3600) / 60);
-            var e = iVal - b * 3600 - c * 60;
-            $("#hevenLeftBox").html((b < 10 ? "0" + b : b) + ":" + (c == 0 ? "00" : c) + ":" + (e == 0 ? "00" : e))
+                var b = Math.floor(iVal / 3600);
+                var c = Math.floor((iVal - b * 3600) / 60);
+                var e = iVal - b * 3600 - c * 60;
+                $("#hevenLeftBox").html((b < 10 ? "0" + b : b) + ":" + (c == 0 ? "00" : c) + ":" + (e == 0 ? "00" : e))
         },
         OneDay: function(b) {
             ii.OneDayBL = BestLimitData;
@@ -119,66 +119,12 @@ function InstHistoryInfo() {
             ii.OneDaySH = ShareHolderData;
             ii.OneDaySY = ShareHolderDataYesterday;
 
-            // var InstSimpleData=[
-                //     'بانك ملت'
-                //     'وبملت'
-                //     'بازار بورس'
-                //     'بازار اول (تابلوي اصلي) بورس'
-                //     1
-                //     'N1'
-                //     'IRO1BMLT0007'
-                //     'IRO1BMLT0001'
-                //     50000000000
-                //     3990423
-                // ];
-            // var LVal18AFC=InstSimpleData[1]; 'وبملت'
-            // var LVal30=InstSimpleData[0]; 'بانك ملت'
-            // var CgrValCot=InstSimpleData[5]; N1
-            // var Flow=InstSimpleData[4]; 1
-            // var InstrumentID=InstSimpleData[7]; IRO1BMLT0001
-            // var InsCode='778253364357513';
-            // var BaseVol=InstSimpleData[9]; 3990423
-            // var ZTitad=InstSimpleData[8]; 50000000000
-            // var CIsin='';
-            // var LVal18AFC=InstSimpleData[1];
-            // var PdrCotVal='';
-            // var PClosing=''; 
-            // var DEven='20190206';
-            // var FlowName=InstSimpleData[3]; 'بازار بورس'
-
             $("#d15").html(LVal30);
             $("#d16").html(LVal18AFC);
             $("#d17").html(FlowName);
             $("#d18").html(bigNumber(parseInt(ZTitad, 10)));
             $("#d19").html(bigNumber(parseInt(BaseVol, 10)));
 
-            // ClientTypeData=[
-                // 502, تعداد خرید حقیقی
-                // 14, تعداد خرید حقوقی
-                // 390, تعداد فروش حقیقی
-                // 7, تعداد فروش حقوقی
-                
-                // 19073346, حجم خرید حقیقی
-                // 19946950, حقوقی
-                // 36571974, حجم فروش حقیقی
-                // 2448322, حقوقی
-                
-                // درصد خرید حقیقی و حقوقی و درصد فروش حقیقی و حقوقی
-                // 49,51,94,6,
-                
-                // ارزش
-                // 45446929044,48042373778,87640935245,5848367577,
-
-                // قیمت میانگین
-                // 2382.7454838810138504277120543,
-                // 2408.5072543922755107923767794,
-                // 2396.3960831045105741352654358,
-                // 2388.7248397065418682673275819,
-
-                // تغییر مالکیت حقوقی به حقیقی
-                // -17498628
-            // ];
-            // تعداد حقیقی و حقوقی
             if (ClientTypeData.length == 21) {
                 for (i = 0; i <= 20; i++) {
                     if (i < 4) {
@@ -192,6 +138,7 @@ function InstHistoryInfo() {
                     }
                 }
             }
+            // hour time scroll, between 30600 and 50400
             $("#heven").range({
                 range: false,
                 passedID: "hevenCursor",
@@ -204,6 +151,7 @@ function InstHistoryInfo() {
                 }
             });
             ii.SetHevenLeftBox(iVal);
+            // Speed of timer
             $("#speed").range({
                 range: false,
                 change: function() {},
@@ -214,6 +162,7 @@ function InstHistoryInfo() {
             });
             $("#speedLeftBox").html(speedVal + " ثانیه");
 
+            // minute time scroll, between 0 and 60 minus 30
             $("#slight").range({
                 range: false,
                 change: function() {
