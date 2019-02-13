@@ -460,7 +460,58 @@ In the HTML document, defined different variables are used in javascript functio
 	}
 
 ## Instrument Basic Information
-- [Symbol Data Sample](http://tse.ir/instrument/%D9%88%D8%A8%D9%85%D9%84%D8%AA1_IRO1BMLT0001.html)
-- [Company State](http://service.tse.ir/api/CompanyState?instId=IRO1ALIR0001)
-- [Company Info](http://tse.ir/json/Instrument/info_IRO1ALIR0001.json)
-- [Company Plot](http://tse.ir/json/Instrument/plot_IRO1ALIR0001.json)
+- [Link](http://tse.ir/instrument/%D9%88%D8%A8%D9%85%D9%84%D8%AA1_IRO1BMLT0001.html)
+
+**Company State**
+- [Link](http://service.tse.ir/api/CompanyState?instId=IRO1BMLT0001)
+	{
+		"InstrumentId":"IRO1BMLT0001",
+		"CompanyName":"بانک ملت",
+		"Status":"عادی",
+		"StatusCode":"0",
+		"Reasons":"",
+		"Description":null,
+		"UpdateDateTime":"2018-08-18T08:31:43.7419427"
+	}
+
+**Basic Info**
+- [Link](http://tse.ir/json/Instrument/BasicInfo/BasicInfo_IRO1BMLT0001.html?updated=1550087351009)
+	کد ISIN	
+	نام شرکت	
+	نماد فارسی	
+	نام انگلیسی شرکت	
+	نماد انگلیسی	
+	کد CISIN	
+	تابلو
+	صنعت
+	کد صنعت	
+	زیر گروه صنعت	
+	کد زیر گروه صنعت	
+
+**Instrument History**
+- [Link](http://tse.ir/json/Instrument/TradeHistory/TradeHistory_IRO1BMLT0001.html?updated=1550087108362)
+**Info**
+- [Link](http://tse.ir/json/Instrument/info_IRO1BMLT0001.json)
+**Price Plot**
+- [Link](http://tse.ir/json/Instrument/plot_IRO1ALIR0001.json)
+
+## Database Straucture
+
+|   instrument     |
+|------------------|
+| Instrument_Id|
+|Company_Name|
+|Company_Name_en|
+|symbol|
+|symbol_en|
+|ISIN|
+|CISIN|
+|tableau|
+|industry|
+|industry_code|
+|subindustry|
+|subindustry_code|
+|Status|
+|StatusCode|
+|Reasons|
+|description|
