@@ -15,6 +15,7 @@ For test select bank melat symbol:
 
 	Bank Melat SYMBOL_ID = 778253364357513
 
+
 ### Today Data
 	URI
 	http://www.tsetmc.com/Loader.aspx?ParTree=151311&i=SYMBOL_ID
@@ -283,6 +284,9 @@ In the HTML document, defined different variables are used in javascript functio
 			2676,'IRO1BMLT0007',567032348,1.130,'','شركت س اآذربايجان غربي س.خ-م ك م ف ع-'
 			2667,'IRO1BMLT0007',547327808,1.090,'','شركت س اسيستان وبلوچستان س.خ-م ك م ف ع-'
 		];
+
+	Get this URI return the shareHolder details info
+	http://cdn.tsetmc.com/tsev2/data/ShareHolder.aspx?i=22366%2CIRO1SIPA0001
 
 	var ClientTypeData=[
 			//
