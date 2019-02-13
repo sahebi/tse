@@ -475,7 +475,8 @@ In the HTML document, defined different variables are used in javascript functio
 	}
 
 **Basic Info**
-- [Link](http://tse.ir/json/Instrument/BasicInfo/BasicInfo_IRO1BMLT0001.html?updated=1550087351009)
+- [Link](http://tse.ir/json/Instrument/BasicInfo/BasicInfo_IRO1BMLT0001.html)
+
 	کد ISIN	
 	نام شرکت	
 	نماد فارسی	
