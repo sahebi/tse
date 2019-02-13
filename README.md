@@ -65,15 +65,15 @@ In the HTML document, defined different variables are used in javascript functio
 	var DEven          = '20180212';
 
 	var StaticTreshholdData =[
-		[    1,1097.00,993.00],
-		[60124,1097.00,993.00]
+		[    1, 1097.00, 993.00],
+		[60124, 1097.00, 993.00]
 	];
 
 	var ClosingPriceData = [
-		C1	آخرین معامله
-		C2	قیمت پایانی
-		C3	اولین قیمت
-		C4	قیمت دیروز
+		C1	LAST Price
+		C2	LAST Price (Close)
+		C3	First Price (Open)
+		C4	Before day price
 
 		 DateTime               X   C1     C2     C3     C4     Low    High  ID   C5       C6
 		['1396/11/23 06:10:47','-','1046','1045',   '0','1045',   '0',   '0','0',   '0',       '0', '0','61047'],
@@ -133,12 +133,12 @@ In the HTML document, defined different variables are used in javascript functio
 
 	var ShareHolderData=[
 			[
-				44141,
-				'IRO1BMLT0007',
-				8499999996,
-				16.990,
-				'',
-				'دولت جمهوري اسلامي ايران'
+				44141, **SHAREHOLDER_ID**
+				'IRO1BMLT0007', **SYMBOL_UID**
+				8499999996, **SHARE**
+				16.990, **SHARE_PERCENT**
+				'', ** SHARE_CHANGE [ArrowUp, Arrow??, ???] **
+				'دولت جمهوري اسلامي ايران' **SHAREHOLDER_NAME**
 			],
 			[
 				965,
@@ -378,3 +378,9 @@ In the HTML document, defined different variables are used in javascript functio
 	ii.OneDayIT = IntraTradeData
 	ii.OneDaySH = ShareHolderData
 	ii.OneDaySY = ShareHolderDataYesterday
+
+### REGEX
+
+
+### Python
+
