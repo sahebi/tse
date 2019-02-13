@@ -391,7 +391,7 @@ In the HTML document, defined different variables are used in javascript functio
 ### REGEX
 
 
-###  Data Listing
+### Instrument Listing
 - [Symbol List](http://tse.ir/listing.html)
 - [Symbol List JSON - Cash نقد](http://tse.ir/json/Listing/ListingByName1.json)
 - [Symbol List JSON - Future آتی](http://tse.ir/json/Listing/ListingByName2.json)
@@ -400,6 +400,67 @@ In the HTML document, defined different variables are used in javascript functio
 - [Symbol List JSON - ETF](http://tse.ir/json/Listing/ListingByName5.json)
 - [Symbol List JSON - tradeOption اختیار](http://tse.ir/json/Listing/ListingByName7.json)
 
+**Cash**
+	{
+		"companies":
+			[
+				{
+					"l":"آ",
+					"list":[
+							{
+								"n":"آبسال‌",
+								"sy":"لابسا1",
+								"s":"A",
+								"ic":"IRO1ASAL0001"
+							},
+							{"n":"آسان پرداخت پرشين","sy":"آپ1","s":"A","ic":"IRO1APPE0001"},
+							{"n":"آلومراد","sy":"فمراد1","s":"A","ic":"IRO1ALMR0001"},
+							{
+								"n":"آلومينيوم‌ايران‌",
+								"sy":"فايرا1",
+								"s":"A",
+								"ic":"IRO1ALIR0001"
+							},
+							{
+								"n":"آهنگري‌ تراكتورسازي‌ ايران‌",
+								"sy":"خاهن1",
+								"s":"IS",
+								"ic":"IRO1ATIR0001"
+							}
+							]
+				},
+				{
+					"l":"ا",
+					"list":[
+							{"n":"افست‌","sy":"چافست1","s":"A","ic":"IRO1OFST0001"},
+							{"n":"البرزدارو","sy":"دالبر1","s":"A","ic":"IRO1DALZ0001"},
+							{"n":"الكتريك‌ خودرو شرق‌","sy":"خشرق1","s":"A","ic":"IRO1KHSH0001"},
+							{"n":"ايران‌ تاير","sy":"پتاير1","s":"A","ic":"IRO1TAIR0001"},
+							{"n":"ايران‌ ترانسفو","sy":"بترانس1","s":"A","ic":"IRO1TRNS0001"},
+							{"n":"ايران‌ خودرو","sy":"خودرو1","s":"A","ic":"IRO1IKCO0001"},
+							{"n":"ايران‌ خودروديزل‌","sy":"خاور1","s":"IS","ic":"IRO1KAVR0001"},
+							{"n":"ايران‌ مرينوس‌","sy":"نمرينو1","s":"A","ic":"IRO1MRIN0001"},
+							{"n":"ايران‌ارقام‌","sy":"مرقام1","s":"A","ic":"IRO1IAGM0001"},
+							{"n":"ايران‌دارو","sy":"ديران1","s":"A","ic":"IRO1IRDR0001"},
+							{"n":"ايران‌ياساتايرورابر","sy":"پاسا1","s":"A","ic":"IRO1YASA0001"},
+							{"n":"ايركا پارت صنعت","sy":"خكار1","s":"A","ic":"IRO1KRIR0001"}
+							]
+				},
+				{
+					"l":"ب",
+					"list":[
+							{"n":"باما","sy":"كاما1","s":"A","ic":"IRO1BAMA0001"},
+							{"n":"بانك  پاسارگاد","sy":"وپاسار1","s":"A","ic":"IRO1BPAS0001"},
+							{"n":"بانك انصار","sy":"وانصار1","s":"IS","ic":"IRO1BANS0001"},
+							{"n":"بانك تجارت","sy":"وتجارت1","s":"A","ic":"IRO1BTEJ0001"},
+							{"n":"بانك خاورميانه","sy":"وخاور1","s":"A","ic":"IRO1BKHZ0001"}
+							]
+				}
+			]
+	}
 
+## Instrument Basic Information
 - [Symbol Data Sample](http://tse.ir/instrument/%D9%88%D8%A8%D9%85%D9%84%D8%AA1_IRO1BMLT0001.html)
--
+- [Company State](http://service.tse.ir/api/CompanyState?instId=IRO1ALIR0001)
+- [Company Info](http://tse.ir/json/Instrument/info_IRO1ALIR0001.json)
+- [Company Plot](http://tse.ir/json/Instrument/plot_IRO1ALIR0001.json)
