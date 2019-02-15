@@ -1,0 +1,2 @@
+SELECT tableau, industry, status, count(*) as cnt FROM `instrument` GROUP BY tableau, industry, status order by STATUS, tableau, cnt DESC
+Show ShareHolder status daily in every insdustry group

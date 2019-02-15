@@ -388,8 +388,6 @@ In the HTML document, defined different variables are used in javascript functio
 	ii.OneDaySH = ShareHolderData
 	ii.OneDaySY = ShareHolderDataYesterday
 
-### REGEX
-
 
 ### Instrument Listing
 - [Symbol List](http://tse.ir/listing.html)
@@ -496,23 +494,46 @@ In the HTML document, defined different variables are used in javascript functio
 **Price Plot**
 - [Link](http://tse.ir/json/Instrument/plot_IRO1ALIR0001.json)
 
-## Database Straucture
+**MArket Watch**
+- http://members.tsetmc.com/tsev2/excel/MarketWatchPlus.aspx?d=1396/02/02
+- http://www.tsetmc.com/tsev2/data/MarketWatchInit.aspx?h=0&r=0
 
-|   instrument     |
-|------------------|
-| Instrument_Id|
-|Company_Name|
-|Company_Name_en|
-|symbol|
-|symbol_en|
-|ISIN|
-|CISIN|
-|tableau|
-|industry|
-|industry_code|
-|subindustry|
-|subindustry_code|
-|Status|
-|StatusCode|
-|Reasons|
-|description|
+## Database Straucture
+	create table instrument(
+		instrument_id	 	bigint,
+		instrument_code	 	bigint not null,
+		company_name	 	varchar(255) not null,
+		company_name_en		varchar(255) not null,
+		symbol				varchar(255) not null,
+		symbol_en			varchar(255) not null,
+		ISIN				varchar(255) not null,
+		CISIN				varchar(255) not null,
+		tableau				varchar(255) not null,
+		industry			varchar(255) not null,
+		industry_code		varchar(255) not null,
+		subindustry			varchar(255) not null,
+		subindustry_code	varchar(255) not null,
+		status				varchar(255) not null,
+		status_code			varchar(255) not null,
+		reasons				varchar(255) not null,
+		description			varchar(255) not null
+	)
+
+	create table instrument_history(
+		instrument_price_id	 	bigint,
+		instrument_code	 		bigint not null,
+		dt						int,
+		cnt						int null,
+		volume					bigint null,
+		value					bigint null,
+		price_yesterday			bigint null,
+		open					bigint null,
+		price_last_contract				bigint null,
+		price_last_contract_change		bigint null,
+		price_last_contract_percent		bigint null,
+		price_last						bigint null,
+		price_last_change				bigint null,
+		price_last_percent				bigint null,
+		low								bigint null,
+		high							bigint null
+	)

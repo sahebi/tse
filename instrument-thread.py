@@ -3,6 +3,8 @@ import json
 from tqdm import tqdm
 from bs4 import BeautifulSoup
 import mysql.connector
+from multiprocessing import Pool
+from multiprocessing.dummy import Pool as ThreadPool
 
 class Database(object):
     def __init__(self,host="localhost",username="root",password="",database="tehran_stock_exchange"):
@@ -10,7 +12,7 @@ class Database(object):
         self.username = username
         self.password = password
         self.database = database
-        self.connect()
+        # self.connect()
 
     def connect(self):
         self.connection = mysql.connector.connect(
@@ -19,19 +21,34 @@ class Database(object):
                                             passwd=self.password, 
                                             database=self.database)
     def insert(self, SQL, val):
-        cursor = self.connection.cursor()
+        connection = mysql.connector.connect(
+                                            host=self.host, 
+                                            user=self.username, 
+                                            passwd=self.password, 
+                                            database=self.database)
+        cursor = connection.cursor()
         cursor.execute(SQL, val)
-        self.connection.commit()
+        connection.commit()
         return cursor.getlastrowid
 
     def update(self, SQL):
-        cursor = self.connection.cursor()
+        connection = mysql.connector.connect(
+                                            host=self.host, 
+                                            user=self.username, 
+                                            passwd=self.password, 
+                                            database=self.database)
+        cursor = connection.cursor()
         cursor.execute(SQL)
-        self.connection.commit()
+        connection.commit()
         return cursor.rowcount
 
     def select(self, tablename, where="1=1", columns="*"):
-        cursor = self.connection.cursor()
+        connection = mysql.connector.connect(
+                                            host=self.host, 
+                                            user=self.username, 
+                                            passwd=self.password, 
+                                            database=self.database)
+        cursor = connection.cursor()
         SQL = f"select {columns} from {tablename} Where {where}"
         cursor.execute(SQL)
         return cursor.fetchall()
@@ -91,7 +108,8 @@ class Database(object):
 class TSE(object):
     """ 
     """
-    def __init__(self, database="tehran_stock_exchange"):
+    def __init__(self, database="tehran_stock_exchange", thread_number=50):
+        self.thread_number = thread_number
         self.db = Database(database=database)
 
     def updateInstrumentURI(self,uri):
@@ -150,23 +168,33 @@ class TSE(object):
         except Exception as e:
             print(f"Error updateInstrumentCode: {e}")
 
+    def openUrlAndExecuteInfirmation(self, ISIN):
+        url = f"http://members.tsetmc.com/tsev2/data/InstTradeHistory.aspx?i={ISIN}&Top=99999999&A=1"
+        r = requests.get(url)
+        if r.status_code == 200:
+            records = r.text.split(';')
+            for j, record in enumerate(tqdm(records)):
+                rec = record.split('@')
+                if len(rec) != 10:
+                    continue
+                rec = [ISIN] + rec
+                self.db.insert_history(rec)
+        return ISIN
+
     def updateInformation(self):
         rows = self.db.select('instrument', where='status="A"', columns='instrument_code')
-        for i, row in enumerate(tqdm(rows)):
-            uri = f"http://members.tsetmc.com/tsev2/data/InstTradeHistory.aspx?i={row[0]}&Top=99999999&A=1"
-            r = requests.get(uri)
-            if r.status_code == 200:
-                records = r.text.split(';')
-                for j, record in enumerate(tqdm(records)):
-                    rec = record.split('@')
-                    if len(rec) != 10:
-                        continue
-                    rec = [row[0]] + rec
-                    self.db.insert_history(rec)
-            # return 1
+        urls = [row[0] for i, row in enumerate(tqdm(rows))]
 
-tse = TSE()
-tse.updateInstrumentCode()
-tse.updateInstrument()
-tse.updateBasicInfo()
-tse.updateInformation()
+        pool    = ThreadPool(self.thread_number)
+        results = pool.map(self.openUrlAndExecuteInfirmation, urls)
+
+        pool.close()
+        pool.join()
+
+        print(results)
+
+tse = TSE(thread_number=200)
+# tse.updateInstrumentCode()
+# tse.updateInstrument()
+# tse.updateBasicInfo()
+# tse.updateInformation()
