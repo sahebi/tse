@@ -520,8 +520,8 @@ In the HTML document, defined different variables are used in javascript functio
 	)
 
 	create table instrument_history(
-		instrument_price_id	 	bigint,
-		instrument_code	 		bigint not null,
+		instrument_history_id	 	bigint,
+		`instrument_code`	 		bigint not null,
 		dt						int,
 		cnt						int null,
 		volume					bigint null,

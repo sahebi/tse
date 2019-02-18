@@ -1,25 +1,42 @@
-import requests
+import re
+import ast
 import json
+import requests
 from tqdm import tqdm
-from bs4 import BeautifulSoup
 import mysql.connector
+from bs4 import BeautifulSoup
 from multiprocessing import Pool
 from multiprocessing.dummy import Pool as ThreadPool
 
+class GetRequest(object):
+    def __init__(self, headers={}):
+        self.headers = headers
+
+    def get(self, url, headers):
+        headers.update(self.headers)
+        try:
+            r = requests.get(url, headers=headers)
+            if(r.status_code == 200):
+                r.encoding = r.apparent_encoding
+                return r.text
+            return None
+        except Exception as e:
+            print(f"GetRequest: {e}")
+
 class Database(object):
-    def __init__(self,host="localhost",username="root",password="",database="tehran_stock_exchange"):
+    def __init__(self, host="localhost", username="root", password="", database="tehran_stock_exchange"):
         self.host     = host
         self.username = username
         self.password = password
         self.database = database
         # self.connect()
 
-    def connect(self):
-        self.connection = mysql.connector.connect(
-                                            host=self.host, 
-                                            user=self.username, 
-                                            passwd=self.password, 
-                                            database=self.database)
+    # def connect(self):
+    #     self.connection = mysql.connector.connect(
+    #                                         host=self.host, 
+    #                                         user=self.username, 
+    #                                         passwd=self.password, 
+    #                                         database=self.database)
     def insert(self, SQL, val):
         connection = mysql.connector.connect(
                                             host=self.host, 
@@ -29,6 +46,7 @@ class Database(object):
         cursor = connection.cursor()
         cursor.execute(SQL, val)
         connection.commit()
+        connection.close()
         return cursor.getlastrowid
 
     def update(self, SQL):
@@ -40,6 +58,7 @@ class Database(object):
         cursor = connection.cursor()
         cursor.execute(SQL)
         connection.commit()
+        connection.close()
         return cursor.rowcount
 
     def select(self, tablename, where="1=1", columns="*"):
@@ -51,7 +70,22 @@ class Database(object):
         cursor = connection.cursor()
         SQL = f"select {columns} from {tablename} Where {where}"
         cursor.execute(SQL)
-        return cursor.fetchall()
+        
+        result = cursor.fetchall()
+        connection.close()
+        return result
+
+    def query(self, sql):
+        connection = mysql.connector.connect(
+                                            host=self.host, 
+                                            user=self.username, 
+                                            passwd=self.password, 
+                                            database=self.database)
+        cursor = connection.cursor()
+        cursor.execute(sql)
+        result = cursor.fetchall()
+        connection.close()
+        return result
 
     # ________________________________________________________________________________
     def insert_instrument_code(self, val):
@@ -111,10 +145,15 @@ class TSE(object):
     def __init__(self, database="tehran_stock_exchange", thread_number=50):
         self.thread_number = thread_number
         self.db = Database(database=database)
+        self.headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.109 Safari/537.36"
+            }
 
     def updateInstrumentURI(self,uri):
         uri_instrument = uri
-        r = requests.get(uri_instrument)
+        headers            = self.headers
+        headers['Referer'] = "http://tse.ir/listing.html"
+        r = requests.get(uri_instrument, headers=headers)
         if(r.status_code == 200):
             js = json.loads(r.text)
 
@@ -140,7 +179,9 @@ class TSE(object):
             ISIN           = x[0]
             uri_basicinfo  = f"http://tse.ir/json/Instrument/BasicInfo/BasicInfo_{ISIN}.html"
             try:
-                r = requests.get(uri_basicinfo)
+                headers            = self.headers
+                headers['Referer'] = "http://tse.ir/instrument/%D9%84%D8%A7%D8%A8%D8%B3%D8%A71_IRO1ASAL0001.html"
+                r = requests.get(uri_basicinfo, headers=headers)
                 if(r.status_code == 200):
                     r.encoding = r.apparent_encoding
                     soup = BeautifulSoup(r.text, 'html.parser')
@@ -152,7 +193,9 @@ class TSE(object):
     def updateInstrumentCode(self):
         uri = 'http://www.tsetmc.com/tsev2/data/MarketWatchInit.aspx?h=0&r=0'
         try:
-            r = requests.get(uri)
+            headers            = self.headers
+            headers['Referer'] = "http://www.tsetmc.com/"
+            r                  = requests.get(uri, headers=headers)
             if(r.status_code == 200):
                 r.encoding = r.apparent_encoding
                 csv = r.text
@@ -168,9 +211,11 @@ class TSE(object):
         except Exception as e:
             print(f"Error updateInstrumentCode: {e}")
 
-    def openUrlAndExecuteInfirmation(self, ISIN):
+    def _openUrlAndExecuteInfirmation(self, ISIN):
         url = f"http://members.tsetmc.com/tsev2/data/InstTradeHistory.aspx?i={ISIN}&Top=99999999&A=1"
-        r = requests.get(url)
+        headers            = self.headers
+        headers['Referer'] = "http://www.tsetmc.com/"
+        r                  = requests.get(url, headers=headers)
         if r.status_code == 200:
             records = r.text.split(';')
             for j, record in enumerate(tqdm(records)):
@@ -186,15 +231,70 @@ class TSE(object):
         urls = [row[0] for i, row in enumerate(tqdm(rows))]
 
         pool    = ThreadPool(self.thread_number)
-        results = pool.map(self.openUrlAndExecuteInfirmation, urls)
+        results = pool.map(self._openUrlAndExecuteInfirmation, urls)
 
         pool.close()
         pool.join()
 
-        print(results)
+        print(f'Finished :){len(results)}')
+        # print(results)
 
-tse = TSE(thread_number=200)
+    def getRegex(self, text, regex):
+        pattern = re.compile(regex, re.UNICODE+re.MULTILINE)
+        return pattern.findall(text)
+
+    def _getSymbolHistoryExtract(self, url):
+        url  = f"http://cdn.tsetmc.com/Loader.aspx?ParTree=15131P&i=59142194115401696&d={rows[0][1]}"
+        r    = GetRequest(headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.109 Safari/537.36"})
+        text = r.get(url, {'Referer': "http://tse.ir/instrument/%D9%84%D8%A7%D8%A8%D8%B3%D8%A71_IRO1ASAL0001.html"})
+
+        try:
+            InstSimpleData = self.getRegex(text, r"<script>var InstSimpleData=\[(.*)\];var LVal18AFC")[0]
+            InstSimpleData = ast.literal_eval(InstSimpleData)
+            
+            StaticTreshholdData = self.getRegex(text, r"<script>var StaticTreshholdData=\[(.*)\];")[0]
+            StaticTreshholdData = ast.literal_eval(StaticTreshholdData)
+
+            ClosingPriceData = self.getRegex(text, r"var ClosingPriceData=\[(.*)\];")[0]
+            ClosingPriceData = ast.literal_eval(ClosingPriceData)
+
+            IntraDayPriceData = self.getRegex(text, r"var IntraDayPriceData=\[(.*)\];")[0]
+            IntraDayPriceData = ast.literal_eval(IntraDayPriceData)
+            
+            InstrumentStateData = self.getRegex(text, r"var InstrumentStateData=\[(.*)\];")[0]
+            InstrumentStateData = ast.literal_eval(InstrumentStateData)
+
+            IntraTradeData = self.getRegex(text, r"var IntraTradeData=\[(.*)\];")[0]
+            IntraTradeData = ast.literal_eval(IntraTradeData)
+
+            ShareHolderData = self.getRegex(text, r"var ShareHolderData=\[(.*)\];")[0]
+            ShareHolderData = ast.literal_eval(ShareHolderData)
+
+            ShareHolderDataYesterday = self.getRegex(text, r"var ShareHolderDataYesterday=\[(.*)\];")[0]
+            ShareHolderDataYesterday = ast.literal_eval(ShareHolderDataYesterday)
+            print(ShareHolderDataYesterday)
+
+            ClientTypeData = self.getRegex(text, r"var ClientTypeData=\[(.*)\];")[0]
+            ClientTypeData = ast.literal_eval(ClientTypeData)
+
+            BestLimitData = self.getRegex(text, r"var BestLimitData=\[(.*)\];")[0]
+            BestLimitData = ast.literal_eval(BestLimitData)
+        except Exception as e:
+            print(f"Extract Data:\nText Len:{len(text)}\n{e}")
+
+    def getSymbolHistory(self):
+        rows = tse.db.query("SELECT instrument_code, dt FROM `instrument_history` Where instrument_history_id <= 74")
+        urls = [f"http://cdn.tsetmc.com/Loader.aspx?ParTree=15131P&i={row[0]}&d={row[1]}" for row in rows]
+
+        pool    = ThreadPool(self.thread_number)
+        pool.map(self._getSymbolHistoryExtract, urls)
+
+        pool.close()
+        pool.join()
+            
+tse = TSE(thread_number=10)
 # tse.updateInstrumentCode()
 # tse.updateInstrument()
 # tse.updateBasicInfo()
 # tse.updateInformation()
+tse.getSymbolHistory()
