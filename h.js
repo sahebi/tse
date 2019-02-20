@@ -138,6 +138,7 @@ function InstHistoryInfo() {
                     }
                 }
             }
+
             // hour time scroll, between 30600 and 50400
             $("#heven").range({
                 range: false,
@@ -284,6 +285,7 @@ function InstHistoryInfo() {
                 var q = "";
                 var o = "";
                 if (Flow != "4") {
+                    // d02     آخرین معامله
                     if (l[8] == "0") {
                         o = "<span style='font-size:15px;font-weight:bold'>" + addCommas(l[3]) + "</span>";
                         q = addCommas(l[2])
@@ -295,17 +297,31 @@ function InstHistoryInfo() {
                         k = q
                     } else {
                         if (s > r) {
-                            k = q + "&nbsp;&nbsp;<span style='font-size:11px;color:red'>" + addCommas(s - r) + "&nbsp;&nbsp;(" + AdvRound(100 * (s - r) / s, 2) + "%)</span>"
+                            
                         } else {
                             if (s < r) {
+                                k = q + "&nbsp;&nbsp;<span style='font-size:11px;color:red'>" +   addCommas(s - r) + "&nbsp;&nbsp;(" + AdvRound(100 * (s - r) / s, 2) + "%)</span>"
                                 k = q + "&nbsp;&nbsp;<span style='font-size:11px;color:green'>" + addCommas(r - s) + "&nbsp;&nbsp;(" + AdvRound(100 * (r - s) / s, 2) + "%)</span>"
                             }
                         }
                     }
+
+                    0    'بانك ملت'
+                    1    'وبملت'
+                    2    'بازار بورس'                       r
+                    3    'بازار اول (تابلوي اصلي) بورس'     p
+                    4    1
+                    5    'N1'               s
+                    6    'IRO1BMLT0007'
+                    7    'IRO1BMLT0001'
+                    8    50000000000
+                    9    4173623
+
                     $("#d02").html(k);
+
                     PdrCotVal = l[2];
                     if (s > p) {
-                        k = o + "&nbsp;&nbsp;<span style='font-size:11px;color:red'>" + addCommas(s - p) + "&nbsp;&nbsp;(" + AdvRound(100 * (s - p) / s, 2) + "%)</span>"
+                            k = o + "&nbsp;&nbsp;<span style='font-size:11px;color:red'>" + addCommas(s - p) + "&nbsp;&nbsp;(" + AdvRound(100 * (s - p) / s, 2) + "%)</span>"
                     } else {
                         if (s < p) {
                             k = o + "&nbsp;&nbsp;<span style='font-size:11px;color:green'>" + addCommas(p - s) + "&nbsp;&nbsp;(" + AdvRound(100 * (p - s) / s, 2) + "%)</span>"
