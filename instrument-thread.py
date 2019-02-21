@@ -193,7 +193,7 @@ class TSE(object):
             except Exception as e:
                 print(f"Error updateBasicInfo: {ISIN} {e}")
 
-    def updateInstrumentCode(self):
+    def insertInstrumentCode(self):
         uri = 'http://www.tsetmc.com/tsev2/data/MarketWatchInit.aspx?h=0&r=0'
         try:
             headers            = self.headers
@@ -252,7 +252,6 @@ class TSE(object):
         instrument_dt = [instrument_id, dt]
         # print(instrument_dt)
 
-
         # url = "data/symbolHistory.html"
         # file = open(url, 'r')
         # textList = file.readlines()
@@ -265,10 +264,13 @@ class TSE(object):
             url = f"http://cdn.tsetmc.com/Loader.aspx?ParTree=15131P&i={row[0]}&d={row[1]}"
             # url = f"http://cdn.tsetmc.com/Loader.aspx?ParTree=15131P&i=59142194115401696&d={row[1]}"
             # url = "http://cdn.tsetmc.com/Loader.aspx?ParTree=15131P&i=3493306453706327&d=20190206"
+            # url = "http://cdn.tsetmc.com/Loader.aspx?ParTree=15131P&i=10145129193828624&d=20190210"
+            # url = "http://cdn.tsetmc.com/Loader.aspx?ParTree=15131P&i=10145129193828624&d=20190209"
+
             r    = GetRequest(headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.109 Safari/537.36"})
             text = r.get(url, {'Referer': "http://tse.ir/instrument/%D9%84%D8%A7%D8%A8%D8%B3%D8%A71_IRO1ASAL0001.html"})
-            print(url+"\n")
-            print(f"Text Length: {len(text)}")
+            print(f"{url}\n")
+            # print(f"Text Length: {len(text)}")
 
             # MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMW
             # SimpleData
@@ -306,12 +308,14 @@ class TSE(object):
 
                         30: 'change_percent_haghighi_hoghoghi',
                     }
+
             if(len(ClientTypeData) < 21):
                 clientTypeColumns = {}
+
             data = list(InstSimpleData) + ClientTypeData
 
             columns = {
-                            -2: 'instrument_id',
+                            -2: 'instrument_code',
                             -1: 'dt',
                             2: 'col_2', 
                             4: 'flow', 
@@ -322,6 +326,7 @@ class TSE(object):
                             9: 'VOLUME_BASE',
                     }
             columns.update(clientTypeColumns)
+
             seprator = ''
             strCols  = ''
             strVal   = ''
@@ -334,7 +339,7 @@ class TSE(object):
                     vals.append(data[i])
 
             SQL = f"insert into instrument_dt ({strCols}) values ({strVal})"
-            self.db.insert(SQL, vals)
+            # self.db.insert(SQL, vals)
 
             # !!!! MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMW
             # !!!! TreshholdData
@@ -351,53 +356,62 @@ class TSE(object):
             # MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMW
             # Closing Price
             ClosingPriceData = self.getRegex(text, r"var ClosingPriceData=\[(.*)\];")[0]
-            ClosingPriceData = ast.literal_eval(ClosingPriceData)
-            ClosingPriceData = np.array(ClosingPriceData)
+            if len(ClosingPriceData) != 0:
+                ClosingPriceData = ast.literal_eval(ClosingPriceData)
+                ClosingPriceData = np.array(ClosingPriceData)
+                if len(ClosingPriceData.shape) == 1:
+                    ClosingPriceData = np.array([ClosingPriceData])
 
-            datetime = np.char.split(ClosingPriceData[:,0])
-            time_string = []
-            time_value  = []
-            for itm in datetime:
-                time_string.append(itm[1])
-                time_value.append(int(itm[1][0:2])*3600 + int(itm[1][3:5]) * 60 + int(itm[1][6:8]))
+                datetime = np.char.split(ClosingPriceData[:,0])
+                time_string = []
+                time_value  = []
+                for itm in datetime:
+                    time_string.append(itm[1])
+                    time_value.append(int(itm[1][0:2])*3600 + int(itm[1][3:5]) * 60 + int(itm[1][6:8]))
 
-            ClosingPriceData = np.c_[np.repeat(instrument_id, ClosingPriceData.shape[0]),  
-                                    np.repeat(dt, ClosingPriceData.shape[0]),
-                                    time_string,
-                                    time_value,
-                                    ClosingPriceData] 
-            ClosingPriceData = ClosingPriceData.tolist()
+                ClosingPriceData = np.c_[np.repeat(instrument_id, ClosingPriceData.shape[0]),  
+                                        np.repeat(dt, ClosingPriceData.shape[0]),
+                                        time_string,
+                                        time_value,
+                                        ClosingPriceData] 
+                ClosingPriceData = ClosingPriceData.tolist()
             
-            # print(ClosingPriceDataTuple)
-            # return
+                columns = ['instrument_code', 'dt', 'time_string', 'time_value', 'date_time_sh', 'col_2', 'last_price', 'last_price_close', 'first_price_close', 'price_yesterday', 'high', 'low', 'id', 'COL_10', 'COL_11', 'COL_12', 'time_number']
+                seprator = ''
+                strCols  = ''
+                strVal   = ''
+                for col in columns:
+                    strCols += seprator + col
+                    strVal  += seprator + '%s'
+                    seprator = ','
 
-            columns = ['instrument_id', 'dt', 'time_string', 'time_value', 'date_time_sh', 'col_2', 'last_price', 'last_price_close', 'first_price_close', 'price_yesterday', 'high', 'low', 'id', 'COL_10', 'COL_11', 'COL_12', 'time_number']
-            seprator = ''
-            strCols  = ''
-            strVal   = ''
-            for col in columns:
-                strCols += seprator + col
-                strVal  += seprator + '%s'
-                seprator = ','
+                SQL = f"insert into close_price ({strCols}) values ({strVal})"
 
-            SQL = f"insert into close_price ({strCols}) values ({strVal})"
+                # for rec in ClosingPriceData:
+                #     self.db.insert(SQL, rec)
 
-            for rec in ClosingPriceData:
-                self.db.insert(SQL, rec)
             return
-
-            # C1	LAST Price
-            # C2	LAST Price (Close)
-            # C3	First Price (Open)
-            # C4	Before day price
-            #  DateTime               X   C1     C2     C3     C4     Low    High  ID      C5        C6   C7    C8
-            # ['1396/11/23 06:10:47','-','1046','1045',   '0','1045',   '0',   '0','0',   '0',       '0', '0','61047'],
-            # ['1396/11/23 09:00:10','-','1045','1045','1045','1045','1045','1045','1','2830', '2957350', '0','90010'],
-            # ['1396/11/23 09:08:13','-','1040','1045','1045','1045','1045','1040','2','32230','33533350','0','90813'],
-
+            # MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMW
+            # Instra Day Price
             IntraDayPriceData = self.getRegex(text, r"var IntraDayPriceData=\[(.*)\];")[0]
             IntraDayPriceData = ast.literal_eval(IntraDayPriceData)
+
             print(row[0], "IntraDayPriceData", len(IntraDayPriceData))
+            print(IntraDayPriceData)
+
+            # (
+            #     time      high  low   open  close volume
+            #     ['09:05', 1600, 1560, 1578, 1586, 107130],
+            #     ['09:20', 1594, 1518, 1525, 1525, 306509],
+            #     ['09:54', 1637, 1520, 1535, 1632, 8575113],
+            #     ['10:01', 1637, 1521, 1536, 1541, 426508],
+            #     ['10:43', 1599, 1482, 1496, 1521, 2023465],
+            #     ['11:09', 1547, 1482, 1520, 1513, 950239],
+            #     ['11:19', 1580, 1510, 1513, 1537, 595077],
+            #     ['11:52', 1579, 1489, 1498, 1518, 583877],
+            #     ['12:10', 1550, 1501, 1501,1512, 297332]
+            # )
+            return
 			# ['09:00',1045,1040,1045,1040,32230  ],
 			# ['09:12',1040,1040,1040,1040,13510  ],
 			# ['09:21',1044,1040,1044,1040,137299 ],
@@ -446,11 +460,10 @@ class TSE(object):
             # [60124,	'3','3', '86998','1021','1060', '23000','2'],
             # [60124,	'4','2','101000','1020','1065',  '3000','1'],
         except Exception as e:
-            # pass
             print(f"Error Extract Data:\nText Len:\n{e}")
 
     def getSymbolHistory(self):
-        rows = tse.db.query("SELECT instrument_code, dt FROM `instrument_history` Where instrument_history_id <= 50")
+        rows = tse.db.query("SELECT instrument_code, dt FROM `instrument_history` where instrument_history_id <= 50")
 
         pool = ThreadPool(self.thread_number)
         pool.map(self._getSymbolHistoryExtract, rows)
@@ -459,10 +472,24 @@ class TSE(object):
         pool.join()
 
 
-tse = TSE(thread_number=1)
-# tse.updateInstrumentCode()
+tse = TSE(thread_number=20)
+
+# Update Instrument Table
+# tse.insertInstrumentCode()
 # tse.updateInstrument()
 # tse.updateBasicInfo()
+
+# Instrument_History:
+#   from instrument where status = 'A'
 # tse.updateInformation()
+
+# from instrument_history:
+#  instrument_dt:
+#  close_price  :
 tse.getSymbolHistory()
+
+
+
+
+
 
