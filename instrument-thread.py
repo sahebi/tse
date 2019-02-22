@@ -64,6 +64,18 @@ class Database(object):
         connection.close()
         return cursor.rowcount
 
+    def execute(self, SQL):
+        connection = mysql.connector.connect(
+                                            host=self.host, 
+                                            user=self.username, 
+                                            passwd=self.password, 
+                                            database=self.database)
+        cursor = connection.cursor()
+        cursor.execute(SQL)
+        connection.commit()
+        connection.close()
+        return cursor.rowcount
+
     def select(self, tablename, where="1=1", columns="*"):
         connection = mysql.connector.connect(
                                             host=self.host, 
@@ -254,10 +266,7 @@ class TSE(object):
 
         # url = "data/symbolHistory.html"
         # file = open(url, 'r')
-        # textList = file.readlines()
-        # text = ''
-        # for txt in textList:
-        #     text += txt
+        # text = file.read()
         # file.close()
 
         try:
@@ -266,10 +275,11 @@ class TSE(object):
             # url = "http://cdn.tsetmc.com/Loader.aspx?ParTree=15131P&i=3493306453706327&d=20190206"
             # url = "http://cdn.tsetmc.com/Loader.aspx?ParTree=15131P&i=10145129193828624&d=20190210"
             # url = "http://cdn.tsetmc.com/Loader.aspx?ParTree=15131P&i=10145129193828624&d=20190209"
+            # url = "http://cdn.tsetmc.com/Loader.aspx?ParTree=15131P&i=1072964149653157&d=20190205"
 
             r    = GetRequest(headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.109 Safari/537.36"})
             text = r.get(url, {'Referer': "http://tse.ir/instrument/%D9%84%D8%A7%D8%A8%D8%B3%D8%A71_IRO1ASAL0001.html"})
-            print(f"{url}\n")
+            print(f"{row[2]} - {url}")
             # print(f"Text Length: {len(text)}")
 
             # MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMW
@@ -339,7 +349,7 @@ class TSE(object):
                     vals.append(data[i])
 
             SQL = f"insert into instrument_dt ({strCols}) values ({strVal})"
-            # self.db.insert(SQL, vals)
+            self.db.insert(SQL, vals)
 
             # !!!! MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMW
             # !!!! TreshholdData
@@ -387,40 +397,44 @@ class TSE(object):
 
                 SQL = f"insert into close_price ({strCols}) values ({strVal})"
 
-                # for rec in ClosingPriceData:
-                #     self.db.insert(SQL, rec)
+                for rec in ClosingPriceData:
+                    self.db.insert(SQL, rec)
 
-            return
             # MWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMWMW
-            # Instra Day Price
+            # Intraday Price
             IntraDayPriceData = self.getRegex(text, r"var IntraDayPriceData=\[(.*)\];")[0]
-            IntraDayPriceData = ast.literal_eval(IntraDayPriceData)
+            if len(IntraDayPriceData) != 0:
+                IntraDayPriceData = ast.literal_eval(IntraDayPriceData)
+                
+                if not type(IntraDayPriceData[0]) is list:
+                    IntraDayPriceData = [IntraDayPriceData]
 
-            print(row[0], "IntraDayPriceData", len(IntraDayPriceData))
-            print(IntraDayPriceData)
+                IntraDayPriceData = np.array(IntraDayPriceData)
+                
+                datetime = IntraDayPriceData[:,0]
+                time_string = []
+                time_value  = []
+                for itm in datetime:
+                    time_string.append(int(itm[0:2])*10000 + int(itm[3:5]) * 100)
+                    time_value.append(int(itm[0:2])*3600 + int(itm[3:5]) * 60)
 
-            # (
-            #     time      high  low   open  close volume
-            #     ['09:05', 1600, 1560, 1578, 1586, 107130],
-            #     ['09:20', 1594, 1518, 1525, 1525, 306509],
-            #     ['09:54', 1637, 1520, 1535, 1632, 8575113],
-            #     ['10:01', 1637, 1521, 1536, 1541, 426508],
-            #     ['10:43', 1599, 1482, 1496, 1521, 2023465],
-            #     ['11:09', 1547, 1482, 1520, 1513, 950239],
-            #     ['11:19', 1580, 1510, 1513, 1537, 595077],
-            #     ['11:52', 1579, 1489, 1498, 1518, 583877],
-            #     ['12:10', 1550, 1501, 1501,1512, 297332]
-            # )
-            return
-			# ['09:00',1045,1040,1045,1040,32230  ],
-			# ['09:12',1040,1040,1040,1040,13510  ],
-			# ['09:21',1044,1040,1044,1040,137299 ],
-			# ['09:33',1040,1033,1040,1036,99436  ],
-            
+                IntraDayPriceData = np.c_[  np.repeat(instrument_id, IntraDayPriceData.shape[0]),  
+                                            np.repeat(dt, IntraDayPriceData.shape[0]),
+                                            time_string,
+                                            time_value,
+                                            IntraDayPriceData
+                                        ]
+
+                for rec in IntraDayPriceData:
+                    recStr = "'" + "','".join(map(str, rec)) + "'"
+                    SQL = f"insert into instraday (instrument_code, dt, time_string, time_value, time_number, high, low, open, close, volume) values ({recStr})"
+                    self.db.execute(SQL)
+
             InstrumentStateData = self.getRegex(text, r"var InstrumentStateData=\[(.*)\];")[0]
             InstrumentStateData = ast.literal_eval(InstrumentStateData)
             print(row[0], "InstrumentStateData", len(InstrumentStateData))
             # [[20170820,1,'A ']];
+            return
 
             IntraTradeData = self.getRegex(text, r"var IntraTradeData=\[(.*)\];")[0]
             IntraTradeData = ast.literal_eval(IntraTradeData)
@@ -463,7 +477,7 @@ class TSE(object):
             print(f"Error Extract Data:\nText Len:\n{e}")
 
     def getSymbolHistory(self):
-        rows = tse.db.query("SELECT instrument_code, dt FROM `instrument_history` where instrument_history_id <= 50")
+        rows = tse.db.query("SELECT instrument_code, dt, instrument_history_id FROM `instrument_history` where instrument_history_id <= 50")
 
         pool = ThreadPool(self.thread_number)
         pool.map(self._getSymbolHistoryExtract, rows)
@@ -472,7 +486,7 @@ class TSE(object):
         pool.join()
 
 
-tse = TSE(thread_number=20)
+tse = TSE(thread_number=25)
 
 # Update Instrument Table
 # tse.insertInstrumentCode()
