@@ -131,9 +131,9 @@ class Database(object):
             SQL = f"Update instrument Set {updateSet} where ISIN = '{val[3]}'"
             # print(SQL)
             return self.update(SQL)
-
         except:
             return -1
+
     def select_instrument(self):
         return self.select('instrument', columns='ISIN')
 
@@ -155,8 +155,6 @@ class Database(object):
             return -1
         
 class TSE(object):
-    """
-    """
     def __init__(self, database="tehran_stock_exchange", thread_number=50):
         self.thread_number = thread_number
         self.db = Database(database=database)
@@ -228,6 +226,7 @@ class TSE(object):
 
     def _openUrlAndExecuteInfirmation(self, ISIN):
         url = f"http://members.tsetmc.com/tsev2/data/InstTradeHistory.aspx?i={ISIN}&Top=99999999&A=1"
+
         headers            = self.headers
         headers['Referer'] = "http://www.tsetmc.com/"
         r                  = requests.get(url, headers=headers)
@@ -239,10 +238,11 @@ class TSE(object):
                     continue
                 rec = [ISIN] + rec
                 self.db.insert_history(rec)
+
         return ISIN
 
     def updateInformation(self):
-        rows = self.db.select('instrument', where='status="A"', columns='instrument_code')
+        rows = self.db.select('instrument', columns='instrument_code')
         urls = [row[0] for i, row in enumerate(tqdm(rows))]
 
         pool    = ThreadPool(self.thread_number)
@@ -271,11 +271,7 @@ class TSE(object):
 
         try:
             url = f"http://cdn.tsetmc.com/Loader.aspx?ParTree=15131P&i={row[0]}&d={row[1]}"
-            # url = f"http://cdn.tsetmc.com/Loader.aspx?ParTree=15131P&i=59142194115401696&d={row[1]}"
-            # url = "http://cdn.tsetmc.com/Loader.aspx?ParTree=15131P&i=3493306453706327&d=20190206"
-            # url = "http://cdn.tsetmc.com/Loader.aspx?ParTree=15131P&i=10145129193828624&d=20190210"
-            # url = "http://cdn.tsetmc.com/Loader.aspx?ParTree=15131P&i=10145129193828624&d=20190209"
-            # url = "http://cdn.tsetmc.com/Loader.aspx?ParTree=15131P&i=1072964149653157&d=20190205"
+            # url = "http://cdn.tsetmc.com/Loader.aspx?ParTree=15131P&i=3493306453706327&d=20190212"
 
             r    = GetRequest(headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.109 Safari/537.36"})
             text = r.get(url, {'Referer': "http://tse.ir/instrument/%D9%84%D8%A7%D8%A8%D8%B3%D8%A71_IRO1ASAL0001.html"})
@@ -289,6 +285,22 @@ class TSE(object):
 
             ClientTypeData = self.getRegex(text, r"var ClientTypeData=\[(.*)\];")[0]
             ClientTypeData = list(ClientTypeData.split(','))
+
+            InstrumentStateData = self.getRegex(text, r"var InstrumentStateData=\[(.*)\];")[0]
+            InstrumentStateData = ast.literal_eval(InstrumentStateData)
+            InstrumentStateDataValue = ''
+            if not type(InstrumentStateData[0]) is list:
+                InstrumentStateDataValue = InstrumentStateData[2].strip()
+            else:
+                seprator = ''
+                for item in InstrumentStateData:
+                    InstrumentStateDataValue += str(seprator+str(item[2].strip()))
+                    seprator = ','
+            InstrumentStateData = [InstrumentStateDataValue]
+
+            InstrumentStateColumn = {
+                        31: 'status'
+                    }
 
             clientTypeColumns = {
                         10: 'buy_haghighi',
@@ -318,11 +330,13 @@ class TSE(object):
 
                         30: 'change_percent_haghighi_hoghoghi',
                     }
-
             if(len(ClientTypeData) < 21):
                 clientTypeColumns = {}
+                InstrumentStateColumn = {
+                            10: 'status'
+                        }
 
-            data = list(InstSimpleData) + ClientTypeData
+            data = list(InstSimpleData) + ClientTypeData + InstrumentStateData
 
             columns = {
                             -2: 'instrument_code',
@@ -336,6 +350,7 @@ class TSE(object):
                             9: 'VOLUME_BASE',
                     }
             columns.update(clientTypeColumns)
+            columns.update(InstrumentStateColumn)
 
             seprator = ''
             strCols  = ''
@@ -430,10 +445,6 @@ class TSE(object):
                     SQL = f"insert into instraday (instrument_code, dt, time_string, time_value, time_number, high, low, open, close, volume) values ({recStr})"
                     self.db.execute(SQL)
 
-            InstrumentStateData = self.getRegex(text, r"var InstrumentStateData=\[(.*)\];")[0]
-            InstrumentStateData = ast.literal_eval(InstrumentStateData)
-            print(row[0], "InstrumentStateData", len(InstrumentStateData))
-            # [[20170820,1,'A ']];
             return
 
             IntraTradeData = self.getRegex(text, r"var IntraTradeData=\[(.*)\];")[0]
@@ -474,7 +485,9 @@ class TSE(object):
             # [60124,	'3','3', '86998','1021','1060', '23000','2'],
             # [60124,	'4','2','101000','1020','1065',  '3000','1'],
         except Exception as e:
+            print("-------------------------------------")
             print(f"Error Extract Data:\nText Len:\n{e}")
+            print("-------------------------------------")
 
     def getSymbolHistory(self):
         rows = tse.db.query("SELECT instrument_code, dt, instrument_history_id FROM `instrument_history` where instrument_history_id <= 50")
@@ -500,7 +513,22 @@ tse = TSE(thread_number=25)
 # from instrument_history:
 #  instrument_dt:
 #  close_price  :
-tse.getSymbolHistory()
+#  Instraday    :
+# tse.getSymbolHistory()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
